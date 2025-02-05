@@ -18,9 +18,8 @@ onMounted(() => {
   if (token) {
     // Если токен есть, перенаправляем пользователя на главную страницу
     router.push("/");
+  } else {
+    router.push("/signup");
   }
-  // } else {
-  //   router.push("/signup");
-  // }
-});
+})
 </script>

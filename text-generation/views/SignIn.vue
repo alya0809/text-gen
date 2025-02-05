@@ -49,7 +49,7 @@
             type="text"
             placeholder="Input login"
             class="input input-bordered input-primary w-full"
-            v-model="email"
+            v-model="username"
           />
         </div>
         <div class="form-control w-full mb-4">
@@ -81,7 +81,7 @@ import Loader from "../src/components/myLoader.vue";
 
 const router = useRouter();
 
-const email = ref("");
+const username = ref("");
 const password = ref("");
 const error = ref("");
 const loading = ref(false);
@@ -93,7 +93,7 @@ const signIn = async () => {
   loading.value = true;
 
   const data = {
-    username: email.value,
+    username: username.value,
     password: password.value,
   };
 
