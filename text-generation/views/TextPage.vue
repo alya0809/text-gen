@@ -3,7 +3,7 @@
     <div class="m-auto w-3/4 bg-base-100 shadow-xl rounded-3xl py-6 px-12 my-12">
       <div class="flex">
         <h1 class="my-6 mx-auto text-3xl font-bold">
-          {{ $t("titleText") }}
+          {{ t("titleText") }}
         </h1>
       </div>
       <div class="radio-container label mb-2">
@@ -44,7 +44,11 @@
       </div>
       <div class="mx-20">
         <div class="theme flex input-group" v-if="selectedOption === 'theme'">
-          <p class="label-input font-body text-lg border-b-2 border-primary pb-2 font-normal w-1/3">{{ $t("themeText") }}</p>
+          <p
+            class="label-input font-body text-lg border-b-2 border-primary pb-2 font-normal w-1/3"
+          >
+            {{ $t("themeText") }}
+          </p>
           <div class="pl-2 w-1/2">
             <input
               type="text"
@@ -59,16 +63,18 @@
           v-else-if="selectedOption === 'keywords'"
         >
           <div class="flex items-center w-full">
-            <p class="label-input font-body w-1/3 text-lg border-b-2 border-primary pb-2 mx-0 font-normal">
+            <p
+              class="label-input font-body w-1/3 text-lg border-b-2 border-primary pb-2 mx-0 font-normal"
+            >
               {{ $t("keywordsText") }}
             </p>
-              <input
-                type="text"
-                :placeholder="$t('inKeywords')"
-                class="input input-bordered input-primary w-1/2 ml-6"
-                v-model="newKeyword"
-                @keydown.enter="addKeyword"
-              />
+            <input
+              type="text"
+              :placeholder="$t('inKeywords')"
+              class="input input-bordered input-primary w-1/2 ml-6"
+              v-model="newKeyword"
+              @keydown.enter="addKeyword"
+            />
           </div>
 
           <div class="badge-container mt-4 flex flex-row gap-x-2">
@@ -94,8 +100,10 @@
               </svg>
             </div>
           </div>
-          <div class="flex items-center w-full mt-4 w-5/6">
-            <p class="label-input w-1/3 font-body text-lg border-b-2 border-primary pb-2 font-normal font-normal">
+          <div class="flex items-center w-full mt-4">
+            <p
+              class="label-input w-1/3 font-body text-lg border-b-2 border-primary pb-2 font-normal"
+            >
               {{ $t("countSynonyms") }}
             </p>
             <div class="radio-container ml-2">
@@ -193,18 +201,22 @@
           </div>
         </div>
         <div class="example flex input-group" v-else-if="selectedOption === 'example'">
-          <p class="label-input font-body text-lg border-b-2 border-primary w-1/3 pb-2 font-normal">
+          <p
+            class="label-input font-body text-lg border-b-2 border-primary w-1/3 pb-2 font-normal"
+          >
             {{ $t("example") }}
           </p>
           <textarea
-            class="textarea textarea-primary textarea-bordered w-1/2 pl-4 ont-body text-lg "
+            class="textarea textarea-primary textarea-bordered w-1/2 pl-4 ont-body text-lg"
             :placeholder="$t('inExample')"
             v-model="exampleText"
           ></textarea>
         </div>
         <div>
           <div class="volume-text flex input-group">
-            <p class="label-input w-1/3 border-b-2 border-primary pb-2 font-normal font-body text-lg font-normal">
+            <p
+              class="label-input w-1/3 border-b-2 border-primary pb-2 font-body text-lg font-normal"
+            >
               {{ $t("volume") }}
             </p>
             <div class="radio-container ml-2">
@@ -271,7 +283,9 @@
             </div>
           </div>
           <div class="flex input-group">
-            <p class="label-input w-1/3 border-b-2 border-primary pb-2 font-normal font-body text-lg font-normal">
+            <p
+              class="label-input w-1/3 border-b-2 border-primary pb-2 font-body text-lg font-normal"
+            >
               {{ $t("countText") }}
             </p>
             <label class="cursor-pointer ml-2">
@@ -284,7 +298,9 @@
             </label>
           </div>
           <div class="flex input-group">
-            <p class="label-input w-1/3 border-b-2 border-primary pb-2 font-normal font-body text-lg font-normal">
+            <p
+              class="label-input w-1/3 border-b-2 border-primary pb-2 font-body text-lg font-normal"
+            >
               {{ $t("showExample") }}
             </p>
             <input
@@ -310,7 +326,7 @@
       </div>
       <div class="flex">
         <button
-          class="btn btn-accent mt-4 w-3/6 m-auto font-body text-lg font-normal"
+          class="btn btn-accent mt-4 w-3/6 m-auto font-body text-lg font-normal my-6"
           @click="handlerGenerateText"
         >
           {{ $t("gen") }}
@@ -349,215 +365,157 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+const { t } = useI18n();
+const selectedOption = ref("theme"); // По умолчанию выбираем "По теме"
+const keywords = ref([]); // Список ключевых слов
+const newKeyword = ref(""); // Новое ключевое слово
+const synonymMode = ref("same"); // "same" или "different"
+const sameSynonymCount = ref(null); // Количество синонимов для всех ключевых слов
+const individualSynonymCounts = ref([]); // Количество синонимов для каждого слова
+const theme = ref(""); // Тема текста
+const exampleText = ref(""); // Пример текста
+const volumeType = ref("sentences"); // Тип объема текста
+const lengthText = ref(0);
+const synonyms = ref([]);
+const texts = ref([]);
+const textCount = ref(); // Количество текстов
+const showExampleText = ref(false); // Показать пример текста
+const synonymsModal = ref(null);
+const textsModal = ref(null);
+const EXAMPLE_TEXT_COUNT = 1;
+const data = ref();
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-export default {
-  setup() {
-    const { t } = useI18n();
-    const selectedOption = ref("theme"); // По умолчанию выбираем "По теме"
-    const keywords = ref([]); // Список ключевых слов
-    const newKeyword = ref(""); // Новое ключевое слово
-    const synonymMode = ref("same"); // "same" или "different"
-    const sameSynonymCount = ref(null); // Количество синонимов для всех ключевых слов
-    const individualSynonymCounts = ref([]); // Количество синонимов для каждого слова
-    const theme = ref(""); // Тема текста
-    const exampleText = ref(""); // Пример текста
-    const volumeType = ref("sentences"); // Тип объема текста
-    const lengthText = ref(0);
-    const synonyms = ref([]);
-    const texts = ref([]);
-    const textCount = ref(); // Количество текстов
-    const showExampleText = ref(false); // Показать пример текста
-    const synonymsModal = ref(null);
-    const textsModal = ref(null);
-    const EXAMPLE_TEXT_COUNT = 1;
-    const data = ref();
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
-    //     synonyms.value = [
-    //       { word: "большой", synonyms: ["огромный", "крупный", "величественный"] },
-    //       { word: "молоко", synonyms: ["молочный продукт", "коровье молоко"] },
-    //       { word: "большой", synonyms: ["огромный", "крупный", "величественный"] },
-    //       { word: "молоко", synonyms: ["молочный продукт", "коровье молоко"] },
-    //       { word: "большой", synonyms: ["огромный", "крупный", "величественный"] },
-    //       { word: "молоко", synonyms: ["молочный продукт", "коровье молоко"] },
-    //       { word: "большой", synonyms: ["огромный", "крупный", "величественный"] },
-    //       { word: "молоко", synonyms: ["молочный продукт", "коровье молоко"] },
-    //     ];
+// Функция для добавления ключевого слова
+const addKeyword = () => {
+  if (newKeyword.value.trim()) {
+    keywords.value.push(newKeyword.value.trim());
+    newKeyword.value = ""; // Очистка поля ввода
+  }
+};
 
-    //     texts.value = [
-    //       "У австралийских аборигенов во время обрядов инициации, которым каждый юноша должен подвергнуться, прежде чем он получит права и привилегии взрослого мужчины, бытует обычай выбивать один или несколько передних зубов. Происхождение и сущность этого обычая неясны.",
-    //       `Так молится младенец, глядя в пустой потолок: «А-гу!»
-    // Почти «ау», а что тут странного — пришел в лес, нужно выяснить, кто там еще.
-    // — Я бабка-сыроежка, я моховик-дуровик, я лисичка-приличка, а ты кто?
-    // — А я сам еще не знаю… Наверное, Вася.`,
-    //       `Она смотрела на картонку, вырезанную по размеру ноги дочери, и начинала верить, что вселенная родилась из точки.
+// Функция для удаления ключевого слова
+const removeKeyword = (index) => {
+  keywords.value.splice(index, 1); // Удаляем слово по индексу
+  individualSynonymCounts.value.splice(index, 1);
+};
 
-    // Сердце слона весит 20–30 кг и бьется с частотой 30 раз в минуту. Какого размера у слона грусть?`,
-    //       "У австралийских аборигенов во время обрядов инициации, которым каждый юноша должен подвергнуться, прежде чем он получит права и привилегии взрослого мужчины, бытует обычай выбивать один или несколько передних зубов. Происхождение и сущность этого обычая неясны.",
-    //       `Так молится младенец, глядя в пустой потолок: «А-гу!»
-    // Почти «ау», а что тут странного — пришел в лес, нужно выяснить, кто там еще.
-    // — Я бабка-сыроежка, я моховик-дуровик, я лисичка-приличка, а ты кто?
-    // — А я сам еще не знаю… Наверное, Вася.`,
-    //       `Она смотрела на картонку, вырезанную по размеру ноги дочери, и начинала верить, что вселенная родилась из точки.
+watch(showExampleText, async (newValue) => {
+  if (newValue) {
+    try {
+      await generateText(EXAMPLE_TEXT_COUNT);
+    } catch (error) {
+      console.error(t("errors.request"), error);
+    }
+  }
+});
 
-    // Сердце слона весит 20–30 кг и бьется с частотой 30 раз в минуту. Какого размера у слона грусть?`,
-    //     ];
+// Функция для генерации текста
+const generateText = async (numsamples) => {
+  let data = {};
 
-    // Функция для добавления ключевого слова
-    const addKeyword = () => {
-      if (newKeyword.value.trim()) {
-        keywords.value.push(newKeyword.value.trim());
-        newKeyword.value = ""; // Очистка поля ввода
-      }
+  // Добавляем данные в зависимости от выбранного варианта
+  if (selectedOption.value === "theme") {
+    data = {
+      theme: theme.value,
     };
-
-    // Функция для удаления ключевого слова
-    const removeKeyword = (index) => {
-      keywords.value.splice(index, 1); // Удаляем слово по индексу
-      individualSynonymCounts.value.splice(index, 1);
+  } else if (selectedOption.value === "keywords") {
+    data = {
+      key_words: keywords.value,
+      synonym_count:
+        synonymMode.value === "same"
+          ? sameSynonymCount.value
+          : individualSynonymCounts.value,
     };
+  } else if (selectedOption.value === "example") {
+    data = {
+      example_text: exampleText.value,
+    };
+  }
 
-    watch(showExampleText, async (newValue) => {
-      if (newValue) {
-        try {
-          await generateText(EXAMPLE_TEXT_COUNT);
-        } catch (error) {
-          console.error("Произошла ошибка при выполнении запроса:", error);
-        }
-      }
+  // Добавляем дополнительные заголовки
+  data.num_samples = numsamples; // Количество текстов
+  data.max_length = lengthText.value; // Объем текстов
+  data.max_length_type = volumeType.value; // Тип максимальной длины (например, по символам или по словам)
+
+  try {
+    const response = await fetch(`${BASE_URL}/generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // Указываем, что отправляем JSON
+      },
+      body: JSON.stringify(data), // Преобразуем объект в строку JSON
     });
 
-    // Функция для генерации текста
-    const generateText = async (numsamples) => {
-      let data = {};
+    if (!response.ok) {
+      throw new Error(t("errors.network"));
+    }
 
-      // Добавляем данные в зависимости от выбранного варианта
-      if (selectedOption.value === "theme") {
-        data = {
-          theme: theme.value,
-        };
-      } else if (selectedOption.value === "keywords") {
-        data = {
-          key_words: keywords.value,
-          synonym_count:
-            synonymMode.value === "same"
-              ? sameSynonymCount.value
-              : individualSynonymCounts.value,
-        };
-      } else if (selectedOption.value === "example") {
-        data = {
-          example_text: exampleText.value,
-        };
-      }
+    const result = await response.json();
+    texts.value = result.generated_texts;
+  } catch (error) {
+    console.error(t("errors.request"), error);
+  }
+};
 
-      // Добавляем дополнительные заголовки
-      data.num_samples = numsamples; // Количество текстов
-      data.max_length = lengthText.value; // Объем текстов
-      data.max_length_type = volumeType.value; // Тип максимальной длины (например, по символам или по словам)
+const handlerGenerateText = async () => {
+  try {
+    await generateText(textCount.value);
+    textsModal.value.showModal();
+  } catch (error) {
+    console.error(t("errors.error"), error);
+  }
+};
 
-      try {
-        const response = await fetch(`${BASE_URL}/generate`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json", // Указываем, что отправляем JSON
-          },
-          body: JSON.stringify(data), // Преобразуем объект в строку JSON
-        });
+const showSynonymsModal = async () => {
+  try {
+    await generateSynonyms();
+    synonymsModal.value.showModal();
+  } catch (error) {
+    console.error("Error in showSynonymsModal:", error);
+  }
+};
 
-        if (!response.ok) {
-          throw new Error("Ошибка сети");
-        }
+const closeModal = () => {
+  if (synonymsModal) {
+    synonymsModal.value.close();
+  } else if (textsModal) {
+    textsModal.value.close();
+  }
+};
 
-        const result = await response.json();
-        texts.value = result.generated_texts;
-      } catch (error) {
-        console.error("Ошибка при генерации текста:", error);
-      }
-    };
+const generateSynonyms = async () => {
+  const data = {
+    word_count_pairs: keywords.value.map((keyword, index) => ({
+      word: keyword,
+      count:
+        synonymMode.value === "same"
+          ? sameSynonymCount.value
+          : individualSynonymCounts.value[index],
+    })),
+  };
 
-    const handlerGenerateText = async () => {
-      try {
-        await generateText(textCount.value);
-        textsModal.value.showModal();
-      } catch (error) {
-        console.error("Ошибка:", error);
-      }
-    };
+  try {
+    const response = await fetch(`${BASE_URL}/synonyms`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
 
-    const showSynonymsModal = async () => {
-      try {
-        await fetchSynonyms();
-        synonymsModal.value.showModal();
-      } catch (error) {
-        console.error("Error in showSynonymsModal:", error);
-      }
-    };
-
-    const closeModal = () => {
-      if (synonymsModal) {
-        synonymsModal.value.close();
-      } else if (textsModal) {
-        textsModal.value.close();
-      }
-    };
-
-    const generateSynonyms = async () => {
-      const data = {
-        word_count_pairs: keywords.value.map((keyword, index) => ({
-          word: keyword,
-          count:
-            synonymMode.value === "same"
-              ? sameSynonymCount.value
-              : individualSynonymCounts.value[index],
-        })),
-      };
-
-      try {
-        const response = await fetch(`${BASE_URL}/synonyms`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-
-        if (!response.ok) {
-          throw new Error("Ошибка сети при получении сгенерированного текста");
-        }
-        const result = await response.json();
-        synonyms.value = result.synonyms;
-      } catch (error) {
-        console.error("Ошибка при генерации синонимов:", error);
-      }
-    };
-
-    return {
-      keywords,
-      newKeyword,
-      addKeyword,
-      removeKeyword,
-      selectedOption,
-      synonymMode,
-      sameSynonymCount,
-      individualSynonymCounts,
-      theme,
-      exampleText,
-      volumeType,
-      textCount,
-      showExampleText,
-      synonyms,
-      textsModal,
-      closeModal,
-      generateText,
-      showSynonymsModal,
-      synonymsModal,
-      handlerGenerateText,
-      generateSynonyms,
-      texts,
-    };
-  },
+    if (!response.ok) {
+      throw new Error(t("errors.network"));
+    } else {
+      const result = await response.json();
+      synonyms.value = result.synonyms;
+    }
+  } catch (error) {
+    console.error(t("errors.request"), error);
+  }
 };
 </script>
 

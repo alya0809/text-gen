@@ -7,7 +7,7 @@ import ru from './locale/ru.json';
 import './assets/style.css';
 
 const i18n = createI18n({
-    locale: localStorage.getItem('lang') || 'en', // Используем сохраненный язык или 'en' по умолчанию
+    locale: localStorage.getItem('lang') || 'en',
     fallbackLocale: 'en',
     messages: {
       en,
