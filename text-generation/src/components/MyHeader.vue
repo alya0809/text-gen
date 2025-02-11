@@ -40,7 +40,7 @@
           <input
             type="checkbox"
             @change="changeLanguage"
-            :checked="selectedLang === 'ru'"
+            :checked="selectedLang === 'en'"
           />
 
           <!-- Иконка английского флага -->
@@ -54,20 +54,38 @@
           </div>
         </label>
       </div>
-      <div>
+      <div v-if="token">
         <button class="btn btn-ghost ont-body text-lg font-normal">
           <router-link to="/" class="router">
-            <img src="../assets/home.png" alt="home" :class="theme === 'mythemedark' ? 'invert brightness-200 w-10 h-10' : 'w-10 h-10'" />
+            <img
+              src="../assets/home.png"
+              alt="home"
+              :class="
+                theme === 'mythemedark' ? 'invert brightness-200 w-10 h-10' : 'w-10 h-10'
+              "
+            />
           </router-link>
         </button>
         <button class="btn btn-ghost ont-body text-lg font-normal">
           <router-link to="/generation" class="router">
-            <img src="../assets/use.png" alt="use" :class="theme === 'mythemedark' ? 'invert brightness-200 w-10 h-10' : 'w-10 h-10'" />
+            <img
+              src="../assets/use.png"
+              alt="use"
+              :class="
+                theme === 'mythemedark' ? 'invert brightness-200 w-10 h-10' : 'w-10 h-10'
+              "
+            />
           </router-link>
         </button>
         <button class="btn btn-ghost ont-body text-lg font-normal">
           <router-link to="/profile" class="router">
-            <img src="../assets/lk.png" alt="lk" :class="theme === 'mythemedark' ? 'invert brightness-200 w-10 h-10' : 'w-10 h-10'" />
+            <img
+              src="../assets/lk.png"
+              alt="lk"
+              :class="
+                theme === 'mythemedark' ? 'invert brightness-200 w-10 h-10' : 'w-10 h-10'
+              "
+            />
           </router-link>
         </button>
       </div>
@@ -75,36 +93,27 @@
   </div>
 </template>
 
-<script>
-import { ref, onMounted } from "vue";
+<script setup>
+import { ref, onMounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
-export default {
-  setup() {
-    const { locale } = useI18n(); // Доступ к i18n
-    const selectedLang = ref(localStorage.getItem("lang") || "ru");
-    const theme = ref(localStorage.getItem("theme") || "mythemedark");
-    const toggleTheme = () => {
-      theme.value = theme.value === "mythemedark" ? "mythemelight" : "mythemedark";
-      document.documentElement.setAttribute("data-theme", theme.value);
-      localStorage.setItem("theme", theme.value);
-    };
-
-    const changeLanguage = () => {
-      const newLang = selectedLang.value === "en" ? "en" : "ru";
-      selectedLang.value = newLang;
-      locale.value = newLang;
-      localStorage.setItem("lang", newLang);
-    };
-
-    onMounted(() => {
-      document.documentElement.setAttribute("data-theme", theme.value);
-    });
-
-    return {
-      theme,
-      toggleTheme,
-      changeLanguage,
-    };
-  },
+const { locale } = useI18n(); // Доступ к i18n
+const selectedLang = ref(localStorage.getItem("lang") || "en");
+const theme = ref(localStorage.getItem("theme") || "mythemedark");
+const token = localStorage.getItem("token");
+const toggleTheme = () => {
+  theme.value = theme.value === "mythemedark" ? "mythemelight" : "mythemedark";
+  document.documentElement.setAttribute("data-theme", theme.value);
+  localStorage.setItem("theme", theme.value);
 };
+
+const changeLanguage = () => {
+  const newLang = selectedLang.value === "en" ? "ru" : "en";
+  selectedLang.value = newLang;
+  locale.value = newLang;
+  localStorage.setItem("lang", newLang);
+};
+
+onMounted(() => {
+  document.documentElement.setAttribute("data-theme", theme.value);
+});
 </script>

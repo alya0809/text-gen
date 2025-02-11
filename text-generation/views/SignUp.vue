@@ -1,6 +1,10 @@
 <template>
   <div class="flex justify-center items-center py-6">
-    <div class="w-full max-w-md shadow-xl border border-primary rounded-lg">
+    <div
+      v-if="!successMessage"
+      class="w-full max-w-md shadow-xl border border-primary rounded-lg"
+      :class="{ 'animate-shake': shake }"
+    >
       <div class="px-6 py-8">
         <!-- Навигация между Sign Up и Sign In -->
         <div class="tabs tabs-boxed mb-4">
@@ -9,67 +13,60 @@
             class="tab"
             :class="{ 'tab-active': $route.path === '/signup' }"
           >
-            Sign up
+            {{ t("signup") }}
           </router-link>
           <router-link
             to="/signin"
             class="tab"
             :class="{ 'tab-active': $route.path === '/signin' }"
           >
-            Sign in
+            {{ t("login") }}
           </router-link>
         </div>
 
         <!-- Сообщение об ошибке -->
         <div v-if="error" class="alert alert-warning shadow-lg mb-4">
           <div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="stroke-current flex-shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 16h-1v-4h-1m1-4h.01M12 8v.01M12 12h.01M12 16v.01"
-              />
-            </svg>
-            <span>{{ error }}</span>
+            <span>{{ t("errors.request") }}</span>
           </div>
         </div>
 
         <!-- Поля ввода -->
         <div class="form-control w-full mb-4">
           <label class="label">
-            <span class="label-text"><span class="text-error">*</span> Login</span>
+            <span class="label-text"
+              ><span class="text-error">*</span> {{ t("email") }}</span
+            >
           </label>
           <input
             type="text"
-            placeholder="Input login"
+            placeholder="example@mail.ru"
             class="input input-bordered input-primary w-full"
             v-model="email"
           />
         </div>
         <div class="form-control w-full mb-4">
           <label class="label">
-            <span class="label-text"><span class="text-error">*</span> Username</span>
+            <span class="label-text"
+              ><span class="text-error">*</span> {{ t("username") }}</span
+            >
           </label>
           <input
             type="text"
-            placeholder="Input username"
+            placeholder="username"
             class="input input-bordered input-primary w-full"
             v-model="username"
           />
         </div>
         <div class="form-control w-full mb-4">
           <label class="label">
-            <span class="label-text"><span class="text-error">*</span> Password</span>
+            <span class="label-text"
+              ><span class="text-error">*</span> {{ t("password") }}</span
+            >
           </label>
           <input
             type="password"
-            placeholder="Input password"
+            :placeholder="t('passinp')"
             class="input input-bordered input-primary w-full"
             v-model="password"
           />
@@ -77,12 +74,12 @@
         <div class="form-control w-full mb-4">
           <label class="label">
             <span class="label-text">
-              <span class="text-error">*</span> Password confirmation
+              <span class="text-error">*</span> {{ t("passconf") }}
             </span>
           </label>
           <input
             type="password"
-            placeholder="Input password again"
+            :placeholder="t('passconfinp')"
             class="input input-bordered input-primary w-full"
             v-model="confirmPassword"
           />
@@ -91,30 +88,19 @@
         <!-- Ошибка пароля -->
         <div v-if="passwordError" class="alert alert-error shadow-lg mb-4">
           <div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="stroke-current flex-shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-            <span>{{ passwordError }}</span>
+            <span>{{ t("errors.passwordMismatch") }}</span>
           </div>
         </div>
 
         <div class="form-control w-full mb-4">
           <label class="label">
-            <span class="label-text"><span class="text-error">*</span> Fullname</span>
+            <span class="label-text"
+              ><span class="text-error">*</span> {{ t("fullname") }}</span
+            >
           </label>
           <input
             type="text"
-            placeholder="Input fullname"
+            :placeholder="t('fullnameinp')"
             class="input input-bordered input-primary w-full"
             v-model="fullname"
           />
@@ -122,11 +108,13 @@
 
         <div class="form-control w-full mb-4">
           <label class="label">
-            <span class="label-text"><span class="text-error">*</span> Country</span>
+            <span class="label-text"
+              ><span class="text-error">*</span> {{ t("country") }}</span
+            >
           </label>
           <input
             type="text"
-            placeholder="Input countries"
+            :placeholder="t('countryinp')"
             class="input input-bordered input-primary w-full"
             v-model="country"
           />
@@ -134,45 +122,36 @@
 
         <div class="form-control w-full mb-4">
           <label class="label">
-            <span class="label-text"><span class="text-error">*</span> Age</span>
+            <span class="label-text"
+              ><span class="text-error">*</span> {{ t("age") }}</span
+            >
           </label>
           <input
             type="number"
-            placeholder="Input age"
+            placeholder="18"
             class="input input-bordered input-primary w-full"
             v-model="age"
           />
         </div>
 
-        <!-- Кнопка регистрации или входа -->
-        <div class="form-control mt-4">
+        <div class="form-control mt-8">
           <Loader v-if="loading" />
-          <button v-else class="btn btn-primary w-full" @click="registerUser">
-            {{ $route.path === "/signup" ? "Sign up" : "Sign in" }}
+          <button v-else class="btn btn-primary w-full" @click="validateForm">
+            {{ t("signupbut") }}
           </button>
         </div>
+        <div v-if="!validation" role="alert" class="alert alert-warning mt-4">
+          <span>{{ t("validate") }}</span>
+        </div>
       </div>
-      <div class="card bg-primary text-primary-content w-96">
-        <div class="card-body">
-          <div role="alert" class="alert alert-success">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 shrink-0 stroke-current"
-              fill="none"
-              viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Your purchase has been confirmed!</span>
-          </div>
-          <h2 class="card-title">Card title!</h2>
-          <p>If a dog chews shoes whose shoes does he choose?</p>
-          <div class="card-actions justify-end">
-            <button class="btn">Buy Now</button>
-          </div>
+    </div>
+    <div v-else class="card bg-primary text-primary-content w-auto mt-16">
+      <div class="card-body">
+        <h2 class="card-title">{{ t("registration") }}</h2>
+        <div class="card-actions justify-end mt-8">
+          <router-link to="/signin">
+            <button class="btn btn-accent">{{ t("account") }}</button>
+          </router-link>
         </div>
       </div>
     </div>
@@ -180,34 +159,55 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { ref, watch } from "vue";
 import Loader from "../src/components/myLoader.vue";
-
-const router = useRouter();
-
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 const email = ref("");
 const password = ref("");
 const confirmPassword = ref("");
 const passwordError = ref("");
 const error = ref("");
+const validation = ref(true);
 const fullname = ref("");
 const username = ref("");
 const country = ref("");
 const loading = ref(false);
 const age = ref();
-
+const shake = ref(false);
+const successMessage = ref("");
 const BASE_URL = import.meta.env.VITE_BASE_URL;
+
+watch([password, confirmPassword], ([newPassword, newConfirmPassword]) => {
+  if (newPassword && newConfirmPassword && newPassword !== newConfirmPassword) {
+    passwordError.value = true;
+  } else {
+    passwordError.value = false;
+  }
+});
+
+const validateForm = () => {
+  if (
+    !email.value ||
+    !username.value ||
+    !password.value ||
+    !confirmPassword.value ||
+    !fullname.value ||
+    !country.value ||
+    !age.value
+  ) {
+    shake.value = true;
+    validation.value = false;
+    setTimeout(() => (shake.value = false), 500); // Убираем эффект через 500 мс
+  } else {
+    registerUser();
+    validation.value = true;
+  }
+};
 
 const registerUser = async () => {
   passwordError.value = "";
   error.value = "";
-  successMessage.value = "";
-
-  if (password.value !== confirmPassword.value) {
-    passwordError.value = "Пароли не совпадают";
-    return;
-  }
 
   const data = {
     email: email.value,
@@ -236,17 +236,36 @@ const registerUser = async () => {
 
     if (!response.ok) {
       const errorMessage = await response.text();
-      throw new Error(errorMessage || "Ошибка регистрации");
+      throw new Error(errorMessage || "Error registration");
+    } else {
+      successMessage.value = true;
     }
-    // Показываем сообщение и перенаправляем на логин
-    successMessage.value = "Регистрация выполнена успешна! Войдите в аккаунт.";
-    router.push("/signin"); // Переход на страницу логина
-
   } catch (err) {
     error.value = err.message;
   } finally {
     loading.value = false;
   }
 };
-
 </script>
+
+<style>
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.3s ease-in-out;
+}
+</style>

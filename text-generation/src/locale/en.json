@@ -28,5 +28,29 @@
     "regVol": "You can adjust",
     "regVolu": "→ Number of synonyms",
     "regVolum": "→ Volume and number of texts",
-    "genMet": "Generate texts in 3 ways:"
+    "genMet": "Generate texts in 3 ways:",
+    "registration": "Registration completed successfully! Sign in to your account.",
+    "account": "Login to account",
+    "signup": "Sign up",
+    "login": "Login",
+    "signupbut": "Sign up",
+    "loginbut": "Login",
+    "email": "Email",
+    "password": "Password",
+    "passinp": "Input password",
+    "passconf": "Password confirmation",
+    "passconfinp": "Input password again",
+    "fullname": "Fullname",
+    "fullnameinp": "Ivanov Ivan",
+    "country": "Country of Residence",
+    "countryinp": "Russia",
+    "age": "Age",
+    "username": "Username",
+    "validate": "Fill in all required fields marked *",
+    "errors": {
+      "request": "An error occurred while making the request:",
+      "network": "Network error",
+      "error": "Error:",
+      "passwordMismatch": "Passwords do not match"
+    }
     }
