@@ -98,16 +98,18 @@ const signIn = async () => {
   };
 
   try {
+    const formData = new FormData();
+    for (const key in data) {
+        formData.append(key, data[key]);
+    }
+
     const response = await fetch(`${BASE_URL}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: data,
+        method: "POST",
+        body: formData,
     });
 
     if (!response.ok) {
-      throw new Error("Ошибка авторизации");
+        throw new Error("Ошибка авторизации");
     }
 
     const result = await response.json();

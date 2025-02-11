@@ -152,6 +152,29 @@
           </button>
         </div>
       </div>
+      <div class="card bg-primary text-primary-content w-96">
+        <div class="card-body">
+          <div role="alert" class="alert alert-success">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 shrink-0 stroke-current"
+              fill="none"
+              viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Your purchase has been confirmed!</span>
+          </div>
+          <h2 class="card-title">Card title!</h2>
+          <p>If a dog chews shoes whose shoes does he choose?</p>
+          <div class="card-actions justify-end">
+            <button class="btn">Buy Now</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -179,11 +202,13 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 const registerUser = async () => {
   passwordError.value = "";
   error.value = "";
+  successMessage.value = "";
 
   if (password.value !== confirmPassword.value) {
-    passwordError.value = "Passwords do not match";
+    passwordError.value = "Пароли не совпадают";
     return;
   }
+
   const data = {
     email: email.value,
     password: password.value,
@@ -195,6 +220,12 @@ const registerUser = async () => {
 
   try {
     loading.value = true;
+
+    const formData = new FormData();
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+
     const response = await fetch(`${BASE_URL}/auth/register`, {
       method: "POST",
       headers: {
@@ -207,13 +238,15 @@ const registerUser = async () => {
       const errorMessage = await response.text();
       throw new Error(errorMessage || "Ошибка регистрации");
     }
+    // Показываем сообщение и перенаправляем на логин
+    successMessage.value = "Регистрация выполнена успешна! Войдите в аккаунт.";
+    router.push("/signin"); // Переход на страницу логина
 
-    // Перенаправление после успешной регистрации
-    router.push("/");
   } catch (err) {
     error.value = err.message;
   } finally {
     loading.value = false;
   }
 };
+
 </script>
