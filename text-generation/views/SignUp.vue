@@ -223,7 +223,9 @@ const registerUser = async () => {
 
     const response = await fetch(`${BASE_URL}/auth/register`, {
       method: "POST",
-      "Content-Type": "application/json",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: data,
     });
 
