@@ -76,7 +76,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import Loader from "../src/components/myLoader.vue";
+import Loader from "../components/myLoader.vue";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 

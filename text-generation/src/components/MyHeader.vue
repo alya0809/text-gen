@@ -100,6 +100,7 @@ const { locale } = useI18n(); // Доступ к i18n
 const selectedLang = ref(localStorage.getItem("lang") || "en");
 const theme = ref(localStorage.getItem("theme") || "mythemedark");
 const token = localStorage.getItem("token");
+console.log(token);
 const toggleTheme = () => {
   theme.value = theme.value === "mythemedark" ? "mythemelight" : "mythemedark";
   document.documentElement.setAttribute("data-theme", theme.value);

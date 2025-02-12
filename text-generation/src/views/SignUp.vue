@@ -160,7 +160,7 @@
 
 <script setup>
 import { ref, watch } from "vue";
-import Loader from "../src/components/myLoader.vue";
+import Loader from "../components/myLoader.vue";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 const email = ref("");
@@ -226,7 +226,7 @@ const registerUser = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: data,
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
