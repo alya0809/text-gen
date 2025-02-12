@@ -221,14 +221,10 @@ const registerUser = async () => {
   try {
     loading.value = true;
 
-    const formData = new FormData();
-    for (const key in data) {
-      formData.append(key, data[key]);
-    }
-
     const response = await fetch(`${BASE_URL}/auth/register`, {
       method: "POST",
-      body: formData,
+      "Content-Type": "application/json",
+      body: data,
     });
 
     if (!response.ok) {
