@@ -46,7 +46,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-
+const token = localStorage.getItem("token");
 const user = ref(null);
 const loading = ref(true);
 const error = ref("");
