@@ -81,7 +81,7 @@
             <div
               v-for="(keyword, index) in keywords"
               :key="index"
-              class="badge badge-accent h-8 self-center"
+              class="badge badge-accent h-10 min-w-24 justify-around items-center"
             >
               <span>{{ keyword }}</span>
               <svg
@@ -143,7 +143,7 @@
           </div>
 
           <!-- Поля ввода для каждого ключевого слова -->
-          <div v-show="synonymMode === 'different'" class="w-3/5">
+          <div v-show="synonymMode === 'different'" class="w-1/5">
             <div v-for="(keyword, index) in keywords" :key="index" class="mb-2 flex">
               <label class="label">
                 <span>{{ keyword }}:</span>
@@ -175,7 +175,7 @@
                 </form>
 
                 <h3 class="text-2xl font-bold mb-4">{{ $t("syn") }}</h3>
-                <div v-if="synonyms.length" class="flex gap-14 flex-wrap justify-between">
+                <div v-if="synonyms.length" class="flex gap-14 flex-wrap">
                   <div
                     v-for="(item, index) in synonyms"
                     :key="index"
