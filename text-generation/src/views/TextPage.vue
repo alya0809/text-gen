@@ -387,6 +387,7 @@ const synonymsModal = ref(null);
 const textsModal = ref(null);
 const EXAMPLE_TEXT_COUNT = 1;
 const data = ref();
+const token = localStorage.getItem("token");
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 // Функция для добавления ключевого слова
@@ -445,7 +446,8 @@ const generateText = async (numsamples) => {
     const response = await fetch(`${BASE_URL}/generate`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json", // Указываем, что отправляем JSON
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(data), // Преобразуем объект в строку JSON
     });
@@ -503,6 +505,7 @@ const generateSynonyms = async () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
