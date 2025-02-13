@@ -457,7 +457,7 @@ const generateText = async (numsamples) => {
     }
 
     const result = await response.json();
-    texts.value = result;
+    texts.value = result.generated_texts;
   } catch (error) {
     console.error(t("errors.request"), error);
   }
