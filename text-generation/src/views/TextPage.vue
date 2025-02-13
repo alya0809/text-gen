@@ -457,7 +457,7 @@ const generateText = async (numsamples) => {
     }
 
     const result = await response.json();
-    texts.value = result.generated_texts;
+    texts.value = result;
   } catch (error) {
     console.error(t("errors.request"), error);
   }
@@ -501,6 +501,7 @@ const generateSynonyms = async () => {
   };
 
   try {
+    console.log(token);
     const response = await fetch(`${BASE_URL}/synonyms`, {
       method: "POST",
       headers: {
@@ -514,7 +515,7 @@ const generateSynonyms = async () => {
       throw new Error(t("errors.network"));
     } else {
       const result = await response.json();
-      synonyms.value = result.synonyms;
+      synonyms.value = result;
     }
   } catch (error) {
     console.error(t("errors.request"), error);
