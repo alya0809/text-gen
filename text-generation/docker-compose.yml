@@ -1,11 +1,10 @@
-version: '1'
+version: '3'
 services:
   vue-app:
     build: .
     ports:
       - "8001:80"
     volumes:
-      - .:/app
-      - /app/node_modules
+      - ./dist:/usr/share/nginx/html  # монтируем только готовую сборку
     environment:
       - NODE_ENV=production

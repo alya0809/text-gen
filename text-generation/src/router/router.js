@@ -6,7 +6,7 @@ import SignUp from '../views/SignUp.vue'
 import UserProfile from '../views/UserProfile.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',

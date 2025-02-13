@@ -12,14 +12,14 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-// onMounted(() => {
-//   const token = localStorage.getItem("token");
+onMounted(() => {
+  const token = localStorage.getItem("token");
 
-//   if (token) {
-//     // Если токен есть, перенаправляем пользователя на главную страницу
-//     router.push("/");
-//   } else {
-//     router.push("/signup");
-//   }
-// });
+  if (token) {
+    // Если токен есть, перенаправляем пользователя на главную страницу
+    router.push("/");
+  } else {
+    router.push("/signup");
+  }
+});
 </script>

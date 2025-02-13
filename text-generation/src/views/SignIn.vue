@@ -96,8 +96,8 @@ const validateForm = () => {
     validation.value = false;
     setTimeout(() => (shake.value = false), 500); // Убираем эффект через 500 мс
   } else {
-    signIn();
     validation.value = true;
+    signIn();
   }
 };
 const signIn = async () => {
@@ -130,7 +130,7 @@ const signIn = async () => {
     localStorage.setItem("token", result.access_token);
 
     // Перенаправление на главную страницу
-    router.push("/");
+    router.replace("/");
   } catch (err) {
     error.value = err.message;
   } finally {

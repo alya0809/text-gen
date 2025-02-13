@@ -407,10 +407,12 @@ const removeKeyword = (index) => {
 watch(showExampleText, async (newValue) => {
   if (newValue) {
     try {
-      if (!synonyms.value.length) {
-        await generateSynonyms();
+      if (selectedOption.value === "keywords") {
+        if (!synonyms.value.length) {
+          await generateSynonyms();
+        }
+        keywords.value.push(...synonyms.value.flatMap((item) => item.synonyms));
       }
-      keywords.value.push(...synonyms.flatMap((item) => item.synonyms));
       await generateText(EXAMPLE_TEXT_COUNT);
     } catch (error) {
       console.error(t("errors.request"), error);
@@ -469,10 +471,12 @@ const generateText = async (numsamples) => {
 
 const handlerGenerateText = async () => {
   try {
-    if (!synonyms.value.length) {
-      await generateSynonyms();
+    if (selectedOption.value === "keywords") {
+      if (!synonyms.value.length) {
+        await generateSynonyms();
+      }
+      keywords.value.push(...synonyms.value.flatMap((item) => item.synonyms));
     }
-    keywords.value.push(...synonyms.flatMap((item) => item.synonyms));
     await generateText(textCount.value);
     textsModal.value.showModal();
   } catch (error) {
@@ -509,7 +513,6 @@ const generateSynonyms = async () => {
   };
 
   try {
-    console.log(token);
     const response = await fetch(`${BASE_URL}/synonyms`, {
       method: "POST",
       headers: {
