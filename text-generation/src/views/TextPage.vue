@@ -313,7 +313,7 @@
         </div>
         <div
           v-show="showExampleText"
-          v-for="(item, index) in texts"
+          v-for="(item, index) in getText"
           :key="index"
           class="my-4 ml-36 items-end"
         >
@@ -377,6 +377,7 @@ const sameSynonymCount = ref(null); // Количество синонимов �
 const individualSynonymCounts = ref([]); // Количество синонимов для каждого слова
 const theme = ref(""); // Тема текста
 const exampleText = ref(""); // Пример текста
+const getText = ref("");
 const volumeType = ref("sentences"); // Тип объема текста
 const lengthText = ref(0);
 const synonyms = ref([]);
@@ -384,6 +385,8 @@ const texts = ref([]);
 const textCount = ref(); // Количество текстов
 const showExampleText = ref(false); // Показать пример текста
 const synonymsModal = ref(null);
+const isGetSynonym = ref(false);
+const isGetTexts = ref(false);
 const textsModal = ref(null);
 const EXAMPLE_TEXT_COUNT = 1;
 const data = ref();
@@ -405,14 +408,8 @@ const removeKeyword = (index) => {
 };
 
 watch(showExampleText, async (newValue) => {
-  if (newValue) {
+  if (newValue && !getText.value.length) {
     try {
-      if (selectedOption.value === "keywords") {
-        if (!synonyms.value.length) {
-          await generateSynonyms();
-        }
-        keywords.value.push(...synonyms.value.flatMap((item) => item.synonyms));
-      }
       await generateText(EXAMPLE_TEXT_COUNT);
     } catch (error) {
       console.error(t("errors.request"), error);
@@ -431,7 +428,7 @@ const generateText = async (numsamples) => {
     };
   } else if (selectedOption.value === "keywords") {
     data = {
-      key_words: keywords.value,
+      key_words: [...keywords.value, ...synonyms.value.flatMap((item) => item.synonyms)],
       synonym_count:
         synonymMode.value === "same"
           ? sameSynonymCount.value
@@ -463,34 +460,37 @@ const generateText = async (numsamples) => {
     }
 
     const result = await response.json();
-    texts.value = result.generated_texts;
+    if (numsamples === EXAMPLE_TEXT_COUNT) {
+      getText.value = result.generated_texts;
+    } else {
+      texts.value = result.generated_texts;
+      isGetTexts.value = true;
+    }
   } catch (error) {
     console.error(t("errors.request"), error);
   }
 };
 
 const handlerGenerateText = async () => {
-  try {
-    if (selectedOption.value === "keywords") {
-      if (!synonyms.value.length) {
-        await generateSynonyms();
-      }
-      keywords.value.push(...synonyms.value.flatMap((item) => item.synonyms));
+  if (!isGetTexts.value) {
+    try {
+      await generateText(textCount.value);
+    } catch (error) {
+      console.error(t("errors.error"), error);
     }
-    await generateText(textCount.value);
-    textsModal.value.showModal();
-  } catch (error) {
-    console.error(t("errors.error"), error);
   }
+  textsModal.value.showModal();
 };
 
 const showSynonymsModal = async () => {
   try {
-    await generateSynonyms();
-    synonymsModal.value.showModal();
+    if (!isGetSynonym.value) {
+      await generateSynonyms();
+    }
   } catch (error) {
     console.error("Error in showSynonymsModal:", error);
   }
+  synonymsModal.value.showModal();
 };
 
 const closeModal = () => {
@@ -527,6 +527,7 @@ const generateSynonyms = async () => {
     } else {
       const result = await response.json();
       synonyms.value = result;
+      isGetSynonym.value = true;
     }
   } catch (error) {
     console.error(t("errors.request"), error);
