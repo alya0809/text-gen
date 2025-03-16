@@ -45,28 +45,27 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { logout } from "../services/logout";
+
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const token = localStorage.getItem("token");
 const user = ref(null);
 const loading = ref(true);
 const error = ref("");
-user.value = {
-  email: "user@example.com",
-  fullname: "Иван Иванов",
-  username: "ivan_ivanov",
-  age: 25,
-  country: "Россия",
-};
 
 const fetchUserData = async () => {
   try {
     loading.value = true;
-    const response = await fetch(`${BASE_URL}/user`, {
+    const response = await fetch(`${BASE_URL}/auth/user`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
+      if (response.status === 401) {
+        // Проверяем статус ошибки
+        logout(); // Вызываем функцию выхода
+      }
       throw new Error("Ошибка загрузки данных");
     }
     user.value = await response.json();

@@ -47,6 +47,7 @@
     "age": "Age",
     "username": "Username",
     "validate": "Fill in all required fields marked *",
+    "temperature": "Temperature",
     "errors": {
       "request": "An error occurred while making the request:",
       "network": "Network error",

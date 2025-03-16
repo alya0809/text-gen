@@ -1,6 +1,9 @@
 <template>
   <div class="flex bg-base-200">
-    <div class="m-auto w-3/4 bg-base-100 shadow-xl rounded-3xl py-6 px-12 my-12">
+    <div
+      class="m-auto w-3/4 bg-base-100 shadow-xl rounded-3xl py-6 px-12 my-12"
+      :class="{ 'animate-shake': shake }"
+    >
       <div class="flex">
         <h1 class="my-6 mx-auto text-3xl font-bold">
           {{ t("titleText") }}
@@ -83,7 +86,7 @@
               :key="index"
               class="badge badge-accent h-10 min-w-24 justify-around items-center"
             >
-              <span>{{ keyword }}</span>
+              <span>{{ keyword[0] }}</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -146,7 +149,7 @@
           <div v-show="synonymMode === 'different'" class="w-1/5">
             <div v-for="(keyword, index) in keywords" :key="index" class="mb-2 flex">
               <label class="label">
-                <span>{{ keyword }}:</span>
+                <span>{{ keyword[0] }}:</span>
               </label>
               <input
                 type="number"
@@ -301,6 +304,23 @@
             <p
               class="label-input w-1/3 border-b-2 border-primary pb-2 font-body text-lg font-normal"
             >
+              {{ $t("temperature") }}
+            </p>
+            <label class="cursor-pointer ml-2">
+              <input
+                type="number"
+                min="0"
+                max="2"
+                step="0.1"
+                class="input input-primary input-bordered input-neutral w-16 h-10 mr-8"
+                v-model.number="temperature"
+              />
+            </label>
+          </div>
+          <div class="flex input-group">
+            <p
+              class="label-input w-1/3 border-b-2 border-primary pb-2 font-body text-lg font-normal"
+            >
               {{ $t("showExample") }}
             </p>
             <input
@@ -327,7 +347,7 @@
       <div class="flex">
         <button
           class="btn btn-accent mt-4 w-3/6 m-auto font-body text-lg font-normal my-6"
-          @click="handlerGenerateText"
+          @click="validateForm"
         >
           {{ $t("gen") }}
         </button>
@@ -368,6 +388,7 @@
 <script setup>
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { logout } from "../services/logout";
 const { t } = useI18n();
 const selectedOption = ref("theme"); // По умолчанию выбираем "По теме"
 const keywords = ref([]); // Список ключевых слов
@@ -385,35 +406,49 @@ const texts = ref([]);
 const textCount = ref(); // Количество текстов
 const showExampleText = ref(false); // Показать пример текста
 const synonymsModal = ref(null);
-const isGetSynonym = ref(false);
-const isGetTexts = ref(false);
 const textsModal = ref(null);
 const EXAMPLE_TEXT_COUNT = 1;
-const data = ref();
+const shake = ref(false);
 const token = localStorage.getItem("token");
 const BASE_URL = import.meta.env.VITE_BASE_URL;
+const temperature = ref(); // Начальное значение
 
 // Функция для добавления ключевого слова
 const addKeyword = () => {
   if (newKeyword.value.trim()) {
-    keywords.value.push(newKeyword.value.trim());
+    keywords.value.push([newKeyword.value.trim()]); // Добавляем как массив
     newKeyword.value = ""; // Очистка поля ввода
   }
+  console.log(keywords.value);
 };
 
 // Функция для удаления ключевого слова
 const removeKeyword = (index) => {
-  keywords.value.splice(index, 1); // Удаляем слово по индексу
-  individualSynonymCounts.value.splice(index, 1);
+  keywords.value.splice(index, 1); // Удаляем массив с ключевым словом по индексу
+  individualSynonymCounts.value.splice(index, 1); // Удаляем соответствующий счетчик
 };
 
 watch(showExampleText, async (newValue) => {
-  if (newValue && !getText.value.length) {
+  if (newValue) {
     try {
       await generateText(EXAMPLE_TEXT_COUNT);
     } catch (error) {
       console.error(t("errors.request"), error);
     }
+  }
+});
+
+watch(temperature, (newValue) => {
+  if (newValue < 0) {
+    temperature.value = 0;
+  } else if (newValue > 2) {
+    temperature.value = 2;
+  }
+});
+
+watch(textCount, (newValue) => {
+  if (newValue < 1) {
+    textCount.value = 1;
   }
 });
 
@@ -428,7 +463,7 @@ const generateText = async (numsamples) => {
     };
   } else if (selectedOption.value === "keywords") {
     data = {
-      key_words: [...keywords.value, ...synonyms.value.flatMap((item) => item.synonyms)],
+      key_words: keywords.value,
       synonym_count:
         synonymMode.value === "same"
           ? sameSynonymCount.value
@@ -444,6 +479,7 @@ const generateText = async (numsamples) => {
   data.num_samples = numsamples; // Количество текстов
   data.max_length = lengthText.value; // Объем текстов
   data.max_length_type = volumeType.value; // Тип максимальной длины (например, по символам или по словам)
+  data.temperature = temperature.value;
 
   try {
     const response = await fetch(`${BASE_URL}/generate`, {
@@ -456,6 +492,10 @@ const generateText = async (numsamples) => {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Проверяем статус ошибки
+        logout(); // Вызываем функцию выхода
+      }
       throw new Error(t("errors.network"));
     }
 
@@ -464,7 +504,6 @@ const generateText = async (numsamples) => {
       getText.value = result.generated_texts;
     } else {
       texts.value = result.generated_texts;
-      isGetTexts.value = true;
     }
   } catch (error) {
     console.error(t("errors.request"), error);
@@ -472,21 +511,19 @@ const generateText = async (numsamples) => {
 };
 
 const handlerGenerateText = async () => {
-  if (!isGetTexts.value) {
-    try {
-      await generateText(textCount.value);
-    } catch (error) {
-      console.error(t("errors.error"), error);
-    }
+  texts.value = [];
+  try {
+    await generateText(textCount.value);
+  } catch (error) {
+    console.error(t("errors.error"), error);
   }
   textsModal.value.showModal();
 };
 
 const showSynonymsModal = async () => {
+  synonyms.value = [];
   try {
-    if (!isGetSynonym.value) {
-      await generateSynonyms();
-    }
+    await generateSynonyms();
   } catch (error) {
     console.error("Error in showSynonymsModal:", error);
   }
@@ -504,7 +541,7 @@ const closeModal = () => {
 const generateSynonyms = async () => {
   const data = {
     word_count_pairs: keywords.value.map((keyword, index) => ({
-      word: keyword,
+      word: keyword[0],
       count:
         synonymMode.value === "same"
           ? sameSynonymCount.value
@@ -523,14 +560,50 @@ const generateSynonyms = async () => {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Проверяем статус ошибки
+        logout(); // Вызываем функцию выхода
+      }
       throw new Error(t("errors.network"));
     } else {
       const result = await response.json();
       synonyms.value = result;
-      isGetSynonym.value = true;
+      keywords.value = synonyms.value.map((item) => [item.word, ...item.synonyms]);
+      console.log(keywords.value);
     }
   } catch (error) {
     console.error(t("errors.request"), error);
+  }
+};
+
+const validateForm = () => {
+  if (selectedOption.value === "theme") {
+    if (!theme.value || !textCount.value || !lengthText.value || temperature.value) {
+      shake.value = true;
+      setTimeout(() => (shake.value = false), 500); // Убираем эффект через 500 мс
+    }
+  } else if (selectedOption.value === "keywords") {
+    // Проверяем, зависит ли логика от режима синонимов
+    const isSynonymNotValid =
+      synonymMode.value === "same"
+        ? !sameSynonymCount.value
+        : !individualSynonymCounts.value;
+    if (
+      !keywords.value ||
+      !textCount.value ||
+      !lengthText.value ||
+      isSynonymNotValid ||
+      temperature.value
+    ) {
+      shake.value = true;
+      setTimeout(() => (shake.value = false), 500); // Убираем эффект через 500 мс
+    }
+  } else if (selectedOption.value === "example") {
+    if (!exampleText.value || !textCount.value || !lengthText.value || temperature.value)
+      shake.value = true;
+    setTimeout(() => (shake.value = false), 500); // Убираем эффект через 500 мс
+  } else {
+    handlerGenerateText();
   }
 };
 </script>

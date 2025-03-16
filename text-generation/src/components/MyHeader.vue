@@ -54,7 +54,9 @@
           </div>
         </label>
       </div>
-      <div v-if="token">
+
+      <!-- Условие для отображения кнопок только на страницах, не равных "/signin" и "/signup" -->
+      <div v-if="!['/signin', '/signup'].includes(route.path)">
         <button class="btn btn-ghost ont-body text-lg font-normal">
           <router-link to="/" class="router">
             <img
@@ -95,11 +97,16 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
+
 const { locale } = useI18n(); // Доступ к i18n
 const selectedLang = ref(localStorage.getItem("lang") || "en");
 const theme = ref(localStorage.getItem("theme") || "mythemedark");
-const token = localStorage.getItem("token");
+
+// Получаем текущий маршрут
+const route = useRoute();
+
 const toggleTheme = () => {
   theme.value = theme.value === "mythemedark" ? "mythemelight" : "mythemedark";
   document.documentElement.setAttribute("data-theme", theme.value);
