@@ -48,6 +48,7 @@
     "username": "Username",
     "validate": "Fill in all required fields marked *",
     "temperature": "Temperature",
+    "reset": "Reset",
     "errors": {
       "request": "An error occurred while making the request:",
       "network": "Network error",

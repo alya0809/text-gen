@@ -344,12 +344,18 @@
           </div>
         </div>
       </div>
-      <div class="flex">
+      <div class="flex gap-x-3">
         <button
           class="btn btn-accent mt-4 w-3/6 m-auto font-body text-lg font-normal my-6"
           @click="validateForm"
         >
           {{ $t("gen") }}
+        </button>
+        <button
+          class="btn btn-accent mt-4 w-1/6 m-auto font-body text-lg font-normal my-6"
+          @click="reset"
+        >
+          {{ $t("reset") }}
         </button>
         <dialog id="my_modal_3" ref="textsModal" class="modal">
           <div class="modal-box">
@@ -605,6 +611,21 @@ const validateForm = () => {
   } else {
     handlerGenerateText();
   }
+};
+
+const reset = () => {
+  keywords.value = [];
+  synonyms.value = [];
+  textCount.value = 1;
+  lengthText.value = 0;
+  temperature.value = 0;
+  sameSynonymCount.value = 0;
+  individualSynonymCounts.value = 0;
+  texts.value = [];
+  theme.value = "";
+  exampleText.value = "";
+  getText.value = "";
+  showExampleText.value = "";
 };
 </script>
 
