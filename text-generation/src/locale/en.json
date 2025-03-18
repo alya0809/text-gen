@@ -52,6 +52,7 @@
     "session": "Your session has expired. Please log in again.",
     "tooltipkey": "Enter keywords one by one. To add a word, press Enter.",
     "tooltiptemp": "Temperature controls the randomness of the generated response. A higher temperature value increases randomness, making responses more varied and creative",
+    "tooltiphistory": "Query History",
     "lk": "Personal account",
     "errors": {
       "request": "An error occurred while making the request:",
