@@ -51,10 +51,12 @@
     "reset": "Reset",
     "session": "Your session has expired. Please log in again.",
     "tooltipkey": "Enter keywords one by one. To add a word, press Enter.",
+    "tooltiptemp": "Temperature controls the randomness of the generated response. A higher temperature value increases randomness, making responses more varied and creative",
     "errors": {
       "request": "An error occurred while making the request:",
       "network": "Network error",
       "error": "Error:",
-      "passwordMismatch": "Passwords do not match"
+      "passwordMismatch": "Passwords do not match",
+      "fetch": "Failed to load data"
     }
     }

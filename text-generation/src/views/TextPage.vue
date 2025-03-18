@@ -60,16 +60,6 @@
               v-model="theme"
             />
           </div>
-          <div class="tooltip">
-            <div class="tooltip-content">
-              <div class="animate-bounce -rotate-10 text-2xl font-black">
-                {{ $t("tooltipkey") }}
-              </div>
-            </div>
-            <button class="btn">
-              <img src="../assets/info.png" alt="info" />
-            </button>
-          </div>
         </div>
         <div
           class="keywords flex flex-col input-group"
@@ -88,6 +78,11 @@
               v-model="newKeyword"
               @keydown.enter="addKeyword"
             />
+            <div class="tooltip" :data-tip="$t('tooltipkey')">
+              <button class="btn btn-ghost">
+                <img src="../assets/info.png" alt="info" />
+              </button>
+            </div>
           </div>
 
           <div class="badge-container mt-4 flex flex-row gap-x-2">
@@ -322,10 +317,15 @@
                 min="0"
                 max="2"
                 step="0.1"
-                class="input input-primary input-bordered input-neutral w-16 h-10 mr-8"
+                class="input input-primary input-bordered input-neutral w-16 h-10"
                 v-model.number="temperature"
               />
             </label>
+            <div class="tooltip" :data-tip="$t('tooltiptemp')">
+              <button class="btn btn-ghost">
+                <img src="../assets/info.png" alt="info" />
+              </button>
+            </div>
           </div>
           <div class="flex input-group">
             <p
@@ -405,7 +405,11 @@
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { logout } from "../services/logout";
+import { useToast } from "vue-toastification";
+import { useRouter } from "vue-router";
 const { t } = useI18n();
+const toast = useToast();
+const router = useRouter();
 const selectedOption = ref("theme"); // По умолчанию выбираем "По теме"
 const keywords = ref([]); // Список ключевых слов
 const newKeyword = ref(""); // Новое ключевое слово
@@ -510,7 +514,7 @@ const generateText = async (numsamples) => {
     if (!response.ok) {
       if (response.status === 401) {
         // Проверяем статус ошибки
-        logout(); // Вызываем функцию выхода
+        logout(router, toast, t); // Вызываем функцию выхода
       }
       throw new Error(t("errors.network"));
     }
@@ -578,7 +582,7 @@ const generateSynonyms = async () => {
     if (!response.ok) {
       if (response.status === 401) {
         // Проверяем статус ошибки
-        logout(); // Вызываем функцию выхода
+        logout(router, toast, t); // Вызываем функцию выхода
       }
       throw new Error(t("errors.network"));
     } else {

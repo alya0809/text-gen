@@ -1,14 +1,9 @@
-import { useRouter } from "vue-router";
-import { useToast } from "vue-toastification";
+export const logout = (router, toast, t) => {
+  toast.warning(t("session"));
 
-const router = useRouter();
-const toast = useToast();
+  // Удаляем токен из localStorage
+  localStorage.removeItem("token");
 
-export const logout = () => {
-    toast.warning($t("session"));
-    // Удаляем токен из localStorage
-    localStorage.removeItem("token");
-  
-    // Перенаправляем на страницу входа
-    router.push("/signin");
-  };
+  // Перенаправляем на страницу входа
+  router.push("/signin");
+};

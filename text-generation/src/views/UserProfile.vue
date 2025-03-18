@@ -45,13 +45,26 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import { logout } from "../services/logout";
+import { useToast } from "vue-toastification";
+import { useRouter } from "vue-router";
+const { t } = useI18n();
+const toast = useToast();
+const router = useRouter();
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const token = localStorage.getItem("token");
 const user = ref(null);
 const loading = ref(true);
 const error = ref("");
+user.value = {
+  email: t("errors.network"),
+  fullname: t("errors.network"),
+  username: t("errors.network"),
+  age: 0,
+  country: t("errors.network"),
+};
 
 const fetchUserData = async () => {
   try {
@@ -64,13 +77,13 @@ const fetchUserData = async () => {
     if (!response.ok) {
       if (response.status === 401) {
         // Проверяем статус ошибки
-        logout(); // Вызываем функцию выхода
+        logout(router, toast, t); // Вызываем функцию выхода
       }
-      throw new Error("Ошибка загрузки данных");
+      throw new Error(t("errors.fetch"));
     }
     user.value = await response.json();
   } catch (err) {
-    error.value = err.message;
+    error.value = t("errors.fetch");
   } finally {
     loading.value = false;
   }
