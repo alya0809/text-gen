@@ -56,7 +56,7 @@
       </div>
 
       <!-- Условие для отображения кнопок только на страницах, не равных "/signin" и "/signup" -->
-      <div>
+      <div v-if="!['/signin', '/signup'].includes(route.path)">
         <button class="btn btn-ghost ont-body text-lg font-normal">
           <router-link to="/" class="router">
             <img

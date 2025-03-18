@@ -3,7 +3,7 @@
     <div class="w-[600px] bg-base-100 shadow-xl">
       <div class="m-8 flex flex-col">
         <h2 class="text-xl text-title text-center pb-6 border-b-2 border-primary">
-          Личный кабинет
+          {{ $t("lk") }}
         </h2>
 
         <!-- Загрузка данных -->
@@ -12,18 +12,24 @@
         </div>
 
         <!-- Ошибка -->
-        <div v-else-if="error" class="text-center text-red-500">Ошибка: {{ error }}</div>
+        <div v-else-if="error" class="text-center text-red-500">
+          {{ $t("errors.error") }} {{ error }}
+        </div>
 
         <!-- Данные пользователя -->
         <div class="flex gap-x-8 my-6">
           <div class="flex flex-1 flex-col gap-4 my-auto">
             <span class="font-bold py-2 border-b-2 border-primary">Email:</span>
-            <span class="font-bold py-2 border-b-2 border-primary">Полное имя:</span>
             <span class="font-bold py-2 border-b-2 border-primary"
-              >Имя пользователя:</span
+              >{{ $t("fullname") }}:</span
             >
-            <span class="font-bold py-2 border-b-2 border-primary">Возраст:</span>
-            <span class="font-bold py-2 border-b-2 border-primary">Страна:</span>
+            <span class="font-bold py-2 border-b-2 border-primary"
+              >{{ $t("username") }}:</span
+            >
+            <span class="font-bold py-2 border-b-2 border-primary">{{ $t("age") }}:</span>
+            <span class="font-bold py-2 border-b-2 border-primary"
+              >{{ $t("country") }}:</span
+            >
           </div>
 
           <div class="flex flex-1 flex-col gap-4">

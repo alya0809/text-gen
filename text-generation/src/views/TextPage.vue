@@ -4,6 +4,14 @@
       class="m-auto w-3/4 bg-base-100 shadow-xl rounded-3xl py-6 px-12 my-12"
       :class="{ 'animate-shake': shake }"
     >
+      <button
+        class="btn btn-ghost tooltip"
+        :data-tip="$t('tooltiphistory')"
+        @click="handlerFetchText"
+      >
+        <img v-if="!loading" src="../assets/globe.png" alt="globe" />
+        <span v-else class="loading loading-spinner"></span>
+      </button>
       <div class="flex">
         <h1 class="my-6 mx-auto text-3xl font-bold">
           {{ t("titleText") }}
@@ -169,7 +177,8 @@
               class="btn btn-accent font-body text-lg font-normal"
               @click="showSynonymsModal"
             >
-              {{ $t("synonyms") }}
+              <span v-if="!loadingSyn">{{ $t("synonyms") }}</span>
+              <span v-else class="loading loading-spinner"></span>
             </button>
             <dialog id="my_modal_3" ref="synonymsModal" class="modal">
               <div class="modal-box">
@@ -359,7 +368,8 @@
           class="btn btn-accent mt-4 w-3/6 m-auto font-body text-lg font-normal my-6"
           @click="validateForm"
         >
-          {{ $t("gen") }}
+          <span v-if="!loadingGen">{{ $t("gen") }}</span>
+          <span v-else class="loading loading-spinner"></span>
         </button>
         <button
           class="btn btn-accent mt-4 w-1/6 m-auto font-body text-lg font-normal my-6"
@@ -397,6 +407,35 @@
           </div>
         </dialog>
       </div>
+      <dialog id="my_modal_4" ref="textsAllModal" class="modal">
+        <div class="modal-box">
+          <form method="dialog">
+            <button
+              class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              @click="closeModal"
+            >
+              ✕
+            </button>
+          </form>
+
+          <h3 v-if="textsAll.length" class="text-xl font-bold mb-4">
+            {{ $t("success") }}
+          </h3>
+          <h3 v-else class="text-xl font-bold mb-4">
+            {{ $t("errors.request") }}
+          </h3>
+          <div class="flex flex-col gap-6">
+            <div v-for="(item, index) in textsAll" :key="index">
+              {{ $t("Text") }} {{ index }}:
+              <div
+                class="border-2 border-primary rounded-3xl p-4 my-4 font-body text-lg font-normal"
+              >
+                {{ item }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </dialog>
     </div>
   </div>
 </template>
@@ -423,15 +462,20 @@ const volumeType = ref("sentences"); // Тип объема текста
 const lengthText = ref(0);
 const synonyms = ref([]);
 const texts = ref([]);
+const textsAll = ref([]);
 const textCount = ref(); // Количество текстов
 const showExampleText = ref(false); // Показать пример текста
 const synonymsModal = ref(null);
 const textsModal = ref(null);
+const textsAllModal = ref(null);
 const EXAMPLE_TEXT_COUNT = 1;
 const shake = ref(false);
 const token = localStorage.getItem("token");
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const temperature = ref(); // Начальное значение
+const loading = ref(false);
+const loadingSyn = ref(false);
+const loadingGen = ref(false);
 
 // Функция для добавления ключевого слова
 const addKeyword = () => {
@@ -439,7 +483,6 @@ const addKeyword = () => {
     keywords.value.push([newKeyword.value.trim()]); // Добавляем как массив
     newKeyword.value = ""; // Очистка поля ввода
   }
-  console.log(keywords.value);
 };
 
 // Функция для удаления ключевого слова
@@ -453,7 +496,7 @@ watch(showExampleText, async (newValue) => {
     try {
       await generateText(EXAMPLE_TEXT_COUNT);
     } catch (error) {
-      console.error(t("errors.request"), error);
+      toast.error(t("errors.request"));
     }
   }
 });
@@ -502,6 +545,7 @@ const generateText = async (numsamples) => {
   data.temperature = temperature.value;
 
   try {
+    loadingGen.value = true;
     const response = await fetch(`${BASE_URL}/generate`, {
       method: "POST",
       headers: {
@@ -526,7 +570,9 @@ const generateText = async (numsamples) => {
       texts.value = result.generated_texts;
     }
   } catch (error) {
-    console.error(t("errors.request"), error);
+    toast.error(t("errors.request"));
+  } finally {
+    loadingGen.value = false;
   }
 };
 
@@ -535,9 +581,19 @@ const handlerGenerateText = async () => {
   try {
     await generateText(textCount.value);
   } catch (error) {
-    console.error(t("errors.error"), error);
+    toast.error(t("errors.request"));
   }
   textsModal.value.showModal();
+};
+
+const handlerFetchText = async () => {
+  textsAll.value = [];
+  try {
+    await fetchTexts();
+  } catch (error) {
+    toast.error(t("errors.request"));
+  }
+  textsAllModal.value.showModal();
 };
 
 const showSynonymsModal = async () => {
@@ -545,7 +601,7 @@ const showSynonymsModal = async () => {
   try {
     await generateSynonyms();
   } catch (error) {
-    console.error("Error in showSynonymsModal:", error);
+    toast.error("Error in showSynonymsModal");
   }
   synonymsModal.value.showModal();
 };
@@ -555,6 +611,8 @@ const closeModal = () => {
     synonymsModal.value.close();
   } else if (textsModal) {
     textsModal.value.close();
+  } else if (textsAll) {
+    textsAllModal.value.close();
   }
 };
 
@@ -570,6 +628,7 @@ const generateSynonyms = async () => {
   };
 
   try {
+    loadingSyn.value = true;
     const response = await fetch(`${BASE_URL}/synonyms`, {
       method: "POST",
       headers: {
@@ -589,10 +648,11 @@ const generateSynonyms = async () => {
       const result = await response.json();
       synonyms.value = result;
       keywords.value = synonyms.value.map((item) => [item.word, ...item.synonyms]);
-      console.log(keywords.value);
     }
   } catch (error) {
-    console.error(t("errors.request"), error);
+    toast.error(t("errors.request"));
+  } finally {
+    loadingSyn.value = false;
   }
 };
 
@@ -624,6 +684,30 @@ const validateForm = () => {
     setTimeout(() => (shake.value = false), 500); // Убираем эффект через 500 мс
   } else {
     handlerGenerateText();
+  }
+};
+
+const fetchTexts = async () => {
+  try {
+    loading.value = true;
+    const response = await fetch(`${BASE_URL}/generated_texts`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      if (response.status === 401) {
+        // Проверяем статус ошибки
+        logout(router, toast, t); // Вызываем функцию выхода
+      }
+      throw new Error(t("errors.fetch"));
+    }
+    const result = await response.json();
+    textsAll.value = result.generated_texts;
+  } catch (err) {
+    error.value = t("errors.fetch");
+  } finally {
+    loading.value = false;
   }
 };
 
