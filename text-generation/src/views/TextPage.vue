@@ -60,6 +60,16 @@
               v-model="theme"
             />
           </div>
+          <div class="tooltip">
+            <div class="tooltip-content">
+              <div class="animate-bounce -rotate-10 text-2xl font-black">
+                {{ $t("tooltipkey") }}
+              </div>
+            </div>
+            <button class="btn">
+              <img src="../assets/info.png" alt="info" />
+            </button>
+          </div>
         </div>
         <div
           class="keywords flex flex-col input-group"

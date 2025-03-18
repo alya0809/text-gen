@@ -1,7 +1,11 @@
 import { useRouter } from "vue-router";
-const router = useRouter(); // Используем Vue Router для перенаправления
+import { useToast } from "vue-toastification";
+
+const router = useRouter();
+const toast = useToast();
 
 export const logout = () => {
+    toast.warning($t("session"));
     // Удаляем токен из localStorage
     localStorage.removeItem("token");
   

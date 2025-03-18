@@ -49,6 +49,8 @@
     "validate": "Fill in all required fields marked *",
     "temperature": "Temperature",
     "reset": "Reset",
+    "session": "Your session has expired. Please log in again.",
+    "tooltipkey": "Enter keywords one by one. To add a word, press Enter.",
     "errors": {
       "request": "An error occurred while making the request:",
       "network": "Network error",
