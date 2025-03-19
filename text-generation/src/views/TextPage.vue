@@ -658,7 +658,7 @@ const generateSynonyms = async () => {
 
 const validateForm = () => {
   if (selectedOption.value === "theme") {
-    if (!theme.value || !textCount.value || !lengthText.value || temperature.value) {
+    if (!theme.value || !textCount.value || !lengthText.value || !temperature.value) {
       shake.value = true;
       setTimeout(() => (shake.value = false), 500); // Убираем эффект через 500 мс
     }
@@ -673,13 +673,13 @@ const validateForm = () => {
       !textCount.value ||
       !lengthText.value ||
       isSynonymNotValid ||
-      temperature.value
+      !temperature.value
     ) {
       shake.value = true;
       setTimeout(() => (shake.value = false), 500); // Убираем эффект через 500 мс
     }
   } else if (selectedOption.value === "example") {
-    if (!exampleText.value || !textCount.value || !lengthText.value || temperature.value)
+    if (!exampleText.value || !textCount.value || !lengthText.value || !temperature.value)
       shake.value = true;
     setTimeout(() => (shake.value = false), 500); // Убираем эффект через 500 мс
   } else {
