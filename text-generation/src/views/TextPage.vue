@@ -430,7 +430,7 @@
               <div
                 class="border-2 border-primary rounded-3xl p-4 my-4 font-body text-lg font-normal"
               >
-                {{ item }}
+                {{ item.text }}
               </div>
             </div>
           </div>
