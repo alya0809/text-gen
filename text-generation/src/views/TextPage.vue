@@ -472,7 +472,7 @@ const EXAMPLE_TEXT_COUNT = 1;
 const shake = ref(false);
 const token = localStorage.getItem("token");
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-const temperature = ref(); // Начальное значение
+const temperature = ref(1); // Начальное значение
 const loading = ref(false);
 const loadingSyn = ref(false);
 const loadingGen = ref(false);
@@ -661,6 +661,8 @@ const validateForm = () => {
     if (!theme.value || !textCount.value || !lengthText.value || !temperature.value) {
       shake.value = true;
       setTimeout(() => (shake.value = false), 500); // Убираем эффект через 500 мс
+    } else {
+      handlerGenerateText();
     }
   } else if (selectedOption.value === "keywords") {
     // Проверяем, зависит ли логика от режима синонимов
@@ -677,13 +679,21 @@ const validateForm = () => {
     ) {
       shake.value = true;
       setTimeout(() => (shake.value = false), 500); // Убираем эффект через 500 мс
+    } else {
+      handlerGenerateText();
     }
   } else if (selectedOption.value === "example") {
-    if (!exampleText.value || !textCount.value || !lengthText.value || !temperature.value)
+    if (
+      !exampleText.value ||
+      !textCount.value ||
+      !lengthText.value ||
+      !temperature.value
+    ) {
       shake.value = true;
-    setTimeout(() => (shake.value = false), 500); // Убираем эффект через 500 мс
-  } else {
-    handlerGenerateText();
+      setTimeout(() => (shake.value = false), 500); // Убираем эффект через 500 мс
+    } else {
+      handlerGenerateText();
+    }
   }
 };
 
